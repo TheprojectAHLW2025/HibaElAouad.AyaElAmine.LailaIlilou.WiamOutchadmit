@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Sign up</h2>
+<form method="POST">
+
+    <input name="fullname" placeholder="Fullname" required><br>
+    <input name="username" placeholder="Username" required><br>
+    <input name="email" type="email" placeholder="Email" required><br>
+    <input name="password" type="password" placeholder="Password" required><br>
+    <input name="phone" placeholder="Phone number" required><br>
+    <!-- Country dropdown -->
+    <label for="country">Country</label><br>
+    <select name="country" id="country" required>
+        <option value="">-- Select your country --</option>
+        {% for code, name in countries %}
+            <option value="{{ code }}">{{ name }}</option>
+        {% endfor %}
+    </select><br>
+
+    <!-- City dropdown (loaded via JS depending on country) -->
+    <label for="city">City</label><br>
+    <select name="city" id="city" required>
+        <option value="">-- Select your city --</option>
+    </select><br>
+    
+
+    <label for="business">Industry</label><br>
+    <select name="business" id="business" required>
+        <option value="">-- Select your industry --</option>
+        <option value="Agriculture and agri-food">Agriculture and agri-food</option>
+        <option value="Manufacturing industry">Manufacturing industry</option>
+        <option value="Construction and public works">Construction and public works</option>
+        <option value="Retail">Retail</option>
+        <option value="Wholesale trade">Wholesale trade</option>
+        <option value="Transport and logistics">Transport and logistics</option>
+        <option value="Finance and insurance">Finance and insurance</option>
+        <option value="Technology and IT">Technology and IT</option>
+        <option value="Education and training">Education and training</option>
+        <option value="Health and social services">Health and social services</option>
+        <option value="Tourism and hospitality">Tourism and hospitality</option>
+        <option value="Energy and environment">Energy and environment</option>
+        <option value="Real estate">Real estate</option>
+        <option value="Media and communication">Media and communication</option>
+        <option value="Public administration">Public administration</option>
+        <option value="Legal services">Legal services</option>
+        <option value="Craftsmanship">Craftsmanship</option>
+        <option value="Fashion and design">Fashion and design</option>
+        <option value="Sports and leisure">Sports and leisure</option>
+        <option value="Autre">Autre</option>
+    </select><br><br>
+
+    <button type="submit">Sign up</button>
+</form>
+
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+
+
+<!-- JavaScript for dynamic city loading -->
+<script>
+    const countrySelect = document.getElementById("country");
+    const citySelect = document.getElementById("city");
+
+    countrySelect.addEventListener("change", () => {
+        const countryCode = countrySelect.value;
+        citySelect.innerHTML = '<option value="">Loading...</option>';
+
+        fetch(`/get_cities/${countryCode}`)
+            .then(response => response.json())
+            .then(cities => {
+                citySelect.innerHTML = '<option value="">-- Select your city --</option>';
+                cities.forEach(city => {
+                    const option = document.createElement("option");
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
+                });
+            })
+            .catch(err => {
+                citySelect.innerHTML = '<option value="">Error loading cities</option>';
+                console.error(err);
+            });
+    });
+</script>
+
+{% endblock %}

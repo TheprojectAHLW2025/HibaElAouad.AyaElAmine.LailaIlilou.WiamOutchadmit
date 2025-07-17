@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Soumettre une transaction</h2>
+  <form method="POST">
+    <label>Montant (MAD)</label>
+    <input type="number" name="amount" required>
+    <label>Fréquence hebdomadaire</label>
+    <input type="number" name="frequency" required>
+    <label>Localisation</label>
+    <input type="text" name="location" required>
+    <button type="submit">Analyser</button>
+  </form>
+  {% if result %}
+    <div class="alert">{{ result }}</div>
+  {% endif %}
+{% endblock %}
