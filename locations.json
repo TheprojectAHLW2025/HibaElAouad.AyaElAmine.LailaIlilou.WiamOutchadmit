@@ -1,0 +1,58 @@
+{
+  "MA": {
+    "country": "Morocco",
+    "cities": ["Casablanca", "Rabat", "Fes", "Marrakesh", "Agadir", "Tangier", "Meknes", "Oujda", "Kenitra", "Tetouan"]
+  },
+  "FR": {
+    "country": "France",
+    "cities": ["Paris", "Marseille", "Lyon", "Toulouse", "Nice", "Nantes", "Strasbourg", "Montpellier", "Bordeaux", "Lille"]
+  },
+  "US": {
+    "country": "United States",
+    "cities": ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose"]
+  },
+  "CA": {
+    "country": "Canada",
+    "cities": ["Toronto", "Montreal", "Vancouver", "Calgary", "Ottawa", "Edmonton", "Winnipeg", "Quebec City", "Hamilton", "Kitchener"]
+  },
+  "BR": {
+    "country": "Brazil",
+    "cities": ["Sao Paulo", "Rio de Janeiro", "Brasilia", "Salvador", "Fortaleza", "Belo Horizonte", "Manaus", "Curitiba", "Recife", "Porto Alegre"]
+  },
+  "AR": {
+    "country": "Argentina",
+    "cities": ["Buenos Aires", "Cordoba", "Rosario", "Mendoza", "La Plata", "San Miguel de Tucuman", "Mar del Plata", "Salta", "Santa Fe", "Corrientes"]
+  },
+  "JP": {
+    "country": "Japan",
+    "cities": ["Tokyo", "Osaka", "Nagoya", "Sapporo", "Fukuoka", "Kobe", "Kyoto", "Yokohama", "Hiroshima", "Sendai"]
+  },
+  "KR": {
+    "country": "South Korea",
+    "cities": ["Seoul", "Busan", "Incheon", "Daegu", "Daejeon", "Gwangju", "Suwon", "Ulsan", "Changwon", "Seongnam"]
+  },
+  "CN": {
+    "country": "China",
+    "cities": ["Beijing", "Shanghai", "Guangzhou", "Shenzhen", "Tianjin", "Chongqing", "Chengdu", "Nanjing", "Wuhan", "Xi'an"]
+  },
+  "GB": {
+    "country": "United Kingdom",
+    "cities": ["London", "Birmingham", "Manchester", "Glasgow", "Leeds", "Liverpool", "Bristol", "Sheffield", "Edinburgh", "Leicester"]
+  },
+  "DE": {
+    "country": "Germany",
+    "cities": ["Berlin", "Hamburg", "Munich", "Cologne", "Frankfurt", "Stuttgart", "Dusseldorf", "Dortmund", "Essen", "Bremen"]
+  },
+  "IT": {
+    "country": "Italy",
+    "cities": ["Rome", "Milan", "Naples", "Turin", "Palermo", "Genoa", "Bologna", "Florence", "Venice", "Verona"]
+  },
+  "ES": {
+    "country": "Spain",
+    "cities": ["Madrid", "Barcelona", "Valencia", "Seville", "Zaragoza", "Malaga", "Murcia", "Palma", "Las Palmas", "Bilbao"]
+  },
+  "NL": {
+    "country": "Netherlands",
+    "cities": ["Amsterdam", "Rotterdam", "The Hague", "Utrecht", "Eindhoven", "Tilburg", "Groningen", "Almere", "Breda", "Nijmegen"]
+  }
+}

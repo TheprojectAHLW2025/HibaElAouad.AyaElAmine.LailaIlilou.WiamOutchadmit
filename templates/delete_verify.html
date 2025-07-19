@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Verify Deletion</h2>
+<p>Enter the code sent to your email to confirm deletion.</p>
+
+<form method="POST">
+    <input name="code" type="text" placeholder="Verification Code" required><br>
+    <button type="submit">Delete My Account</button>
+</form>
+
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+{% endblock %}

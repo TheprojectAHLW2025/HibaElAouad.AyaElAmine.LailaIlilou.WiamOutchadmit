@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}My Account{% endblock %}
+
+{% block content %}
+<h2>My Account</h2>
+
+{% if user.profile_picture %}
+    <img src="{{ url_for('static', filename='uploads/' + user.profile_picture) }}"
+         width="120" style="border-radius: 50%; margin-bottom: 10px;">
+{% else %}
+    <p>No profile picture uploaded.</p>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data" id="profileForm">
+    <label>Profile Picture:</label><br>
+    <input type="file" name="profile_picture" disabled><br><br>
+
+    <input name="fullname" value="{{ user.fullname }}" required disabled><br>
+    <input name="username" value="{{ user.username }}" required disabled><br>
+    <input name="email" type="email" value="{{ user.email }}" required disabled><br>
+    <input name="phone" value="{{ user.phone }}" required disabled><br>
+
+    <label for="country">Country</label><br>
+    <select name="country" id="country" required disabled>
+        <option value="">-- Select your country --</option>
+        {% for code, name in countries %}
+            <option value="{{ code }}" {% if user.country == code %}selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+    </select><br>
+
+    <label for="city">City</label><br>
+    <select name="city" id="city" required disabled>
+        <option value="{{ user.city }}">{{ user.city }}</option>
+    </select><br>
+
+    <label for="business">Industry</label><br>
+    <select name="business" id="business" required disabled>
+        <option value="">-- Select your industry --</option>
+        {% for option in [
+            "Agriculture and agri-food", "Manufacturing industry", "Construction and public works",
+            "Retail", "Wholesale trade", "Transport and logistics", "Finance and insurance", "Technology and IT",
+            "Education and training", "Health and social services", "Tourism and hospitality",
+            "Energy and environment", "Real estate", "Media and communication", "Public administration",
+            "Legal services", "Craftsmanship", "Fashion and design", "Sports and leisure", "Autre"
+        ] %}
+            <option value="{{ option }}" {% if user.business == option %}selected{% endif %}>
+                {{ option }}
+            </option>
+        {% endfor %}
+    </select><br><br>
+
+    <button type="submit" id="saveBtn" style="display:none;">Save Changes</button>
+</form>
+
+<button id="editBtn">Edit Profile</button>
+<hr>
+<form method="POST" action="{{ url_for('delete_request') }}">
+    <button type="submit" style="background-color:red; color:white;">Delete Account</button>
+</form>
+
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+
+
+
+<!-- JavaScript -->
+<script>
+    const form = document.getElementById("profileForm");
+    const inputs = form.querySelectorAll("input, select");
+    const editBtn = document.getElementById("editBtn");
+    const saveBtn = document.getElementById("saveBtn");
+
+    editBtn.addEventListener("click", () => {
+        inputs.forEach(input => {
+            if (input.name !== "email") input.disabled = false;
+        });
+        saveBtn.style.display = "inline";
+        editBtn.style.display = "none";
+    });
+
+    // Dynamic city loading
+    const countrySelect = document.getElementById("country");
+    const citySelect = document.getElementById("city");
+    const currentCity = "{{ user.city }}";
+
+    countrySelect.addEventListener("change", () => {
+        const countryCode = countrySelect.value;
+        citySelect.innerHTML = '<option value="">Loading...</option>';
+
+        fetch(`/get_cities/${countryCode}`)
+            .then(response => response.json())
+            .then(cities => {
+                citySelect.innerHTML = '<option value="">-- Select your city --</option>';
+                cities.forEach(city => {
+                    const option = document.createElement("option");
+                    option.value = city;
+                    option.textContent = city;
+                    if (city === currentCity) option.selected = true;
+                    citySelect.appendChild(option);
+                });
+            })
+            .catch(err => {
+                citySelect.innerHTML = '<option value="">Error loading cities</option>';
+                console.error(err);
+            });
+    });
+
+    // Trigger change on load to ensure cities are set properly
+    if (countrySelect.value) {
+        countrySelect.dispatchEvent(new Event("change"));
+    }
+</script>
+{% endblock %}
