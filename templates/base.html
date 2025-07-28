@@ -36,7 +36,7 @@
                         <a class="nav-link" href="{{ url_for('predict') }}">Detect</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                        <a class="nav-link" href="{{ url_for('about') }}">About us</a>
                     </li>
                 {% endif %}
             </ul>
@@ -49,7 +49,7 @@
                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
 
                             {% if current_user and current_user.profile_picture %}
-                                <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}"
+                                <img src="{{ url_for('static', filename='uploads/' + session.get('profile_picture')) }}"
                                      alt="User avatar" width="32" height="32" class="rounded-circle" />
                             {% else %}
                                 <img src="{{ url_for('static', filename='profileimage.png') }}"
@@ -61,6 +61,7 @@
 
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="{{ url_for('profile') }}">My Account</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('history') }}">My Predictions History</a></li>
                             <li><hr class="dropdown-divider" /></li>
                             <li><a class="dropdown-item" href="{{ url_for('logout') }}">Signout</a></li>
                         </ul>

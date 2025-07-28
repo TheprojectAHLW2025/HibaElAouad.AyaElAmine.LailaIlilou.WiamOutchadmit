@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
@@ -43,3 +44,15 @@ class TempUser(db.Model):
 class TempDeleteUser(db.Model):
     email = db.Column(db.String(120), primary_key=True)
     code = db.Column(db.String(6), nullable=False)
+class PredictionHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_email = db.Column(db.String, db.ForeignKey('users.email'))
+    amount = db.Column(db.Float)
+    frequency = db.Column(db.Float)
+    country_code = db.Column(db.String)
+    time_spent = db.Column(db.Float)
+    account_age = db.Column(db.Integer)
+    prediction = db.Column(db.String)
+    probability = db.Column(db.Float)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+

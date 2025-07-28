@@ -54,5 +54,33 @@
   "NL": {
     "country": "Netherlands",
     "cities": ["Amsterdam", "Rotterdam", "The Hague", "Utrecht", "Eindhoven", "Tilburg", "Groningen", "Almere", "Breda", "Nijmegen"]
+  },
+  "BD": {
+    "country": "Bangladesh",
+    "cities": ["Dhaka", "Chittagong", "Khulna", "Rajshahi", "Sylhet", "Barisal", "Rangpur", "Comilla", "Gazipur", "Narayanganj"]
+  },
+  "NG": {
+    "country": "Nigeria",
+    "cities": ["Lagos", "Abuja", "Kano", "Ibadan", "Port Harcourt", "Benin City", "Maiduguri", "Zaria", "Aba", "Jos"]
+  },
+  "PK": {
+    "country": "Pakistan",
+    "cities": ["Karachi", "Lahore", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta", "Hyderabad", "Sialkot"]
+  },
+  "VE": {
+    "country": "Venezuela",
+    "cities": ["Caracas", "Maracaibo", "Valencia", "Barquisimeto", "Maracay", "Ciudad Guayana", "Barcelona", "Maturin", "San Cristobal", "Petare"]
+  },
+  "AF": {
+    "country": "Afghanistan",
+    "cities": ["Kabul", "Kandahar", "Herat", "Mazar-i-Sharif", "Jalalabad", "Kunduz", "Ghazni", "Balkh", "Farah", "Lashkar Gah"]
+  },
+  "RU": {
+    "country": "Russia",
+    "cities": ["Moscow", "Saint Petersburg", "Novosibirsk", "Yekaterinburg", "Nizhny Novgorod", "Kazan", "Chelyabinsk", "Omsk", "Rostov-on-Don", "Ufa"]
+  },
+  "UA": {
+    "country": "Ukraine",
+    "cities": ["Kyiv", "Kharkiv", "Odesa", "Dnipro", "Donetsk", "Zaporizhzhia", "Lviv", "Kryvyi Rih", "Mykolaiv", "Mariupol"]
   }
 }

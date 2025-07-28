@@ -3,7 +3,7 @@ import random
 import json
 from datetime import datetime, timedelta
 import string
-from flask import Flask, render_template, request, redirect, session, url_for, jsonify
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify ,flash
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -11,7 +11,11 @@ from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-from models import db, User, TempUser ,TempDeleteUser
+from models import db, User, TempUser ,TempDeleteUser, PredictionHistory
+
+import joblib
+import numpy as np
+
 
 app = Flask(__name__)
 app.secret_key = 'thepowerpuffGIRLS_2025'
@@ -34,18 +38,18 @@ app.config['MAIL_USERNAME'] = 'theproject.aalw.2025@gmail.com'
 app.config['MAIL_PASSWORD'] = 'iucl lcvj kfzc ymjs'
 mail = Mail(app)
 
-# Create upload folder if missing
+
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Load locations once
+
 with open('locations.json', 'r', encoding='utf-8') as f:
     locations = json.load(f)
 
-# Create tables if not exist (optional)
+
 with app.app_context():
     db.create_all()
 
@@ -57,10 +61,11 @@ def root():
         return render_template('index.html')
     return render_template('welcome.html')
 
+# -------------- welcome --------------
 @app.route('/welcome')
 def welcome():
     return render_template('welcome.html')
-
+# -------------- register --------------
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -95,6 +100,7 @@ def register():
     countries = sorted([(code, data["country"]) for code, data in locations.items()], key=lambda x: x[1])
     return render_template("register.html", countries=countries)
 
+# -------------- get_cities --------------
 @app.route('/get_cities/<country_code>')
 def get_cities(country_code):
     country = locations.get(country_code.upper())
@@ -104,6 +110,7 @@ def get_cities(country_code):
 
 last_code_sent = {}
 
+# -------------- resend_code --------------
 @app.route('/resend_code', methods=['POST'])
 def resend_code():
     email = session.get('pending_email')
@@ -131,6 +138,7 @@ def resend_code():
     last_code_sent[email] = now
     return jsonify({"message": "Verification code resent successfully"})
 
+# -------------- verify --------------
 @app.route("/verify", methods=["GET", "POST"])
 def verify():
     email = session.get("pending_email")
@@ -283,12 +291,11 @@ def profile():
             session.clear()
             return render_template('delete_success.html')  # Or redirect to a "goodbye" page
 
-    # GET
+    
     return render_template('profile.html', user=user, countries=countries)
 
 @app.context_processor
 def inject_current_user():
-    from flask import session
     if 'email' in session:
         user = User.query.get(session['email'])
     else:
@@ -296,22 +303,80 @@ def inject_current_user():
     return dict(current_user=user)
 
 #------------------predict----------------
-@app.route('/predict', methods=['GET', 'POST'])
+model = joblib.load("logreg_calibrated_model.pkl")
+le = joblib.load("location_encoder.pkl")
+
+risky_countries = ['Bangladesh', 'Nigeria', 'Pakistan', 'Venezuela', 'Afghanistan', 'Russia', 'Ukraine']
+
+# Charger le fichier locations.json
+with open("locations.json", "r", encoding="utf-8") as f:
+    locations = json.load(f)
+
+# Créer la liste des pays (pour affichage et validation)
+country_names = [data["country"] for data in locations.values()]
+
+@app.route("/predict", methods=["GET", "POST"])
 def predict():
-    if 'email' not in session:
-        return redirect(url_for('login'))
+    if request.method == "POST":
+        try:
+            amount = float(request.form["amount"])
+            frequency = float(request.form["frequency"])
+            country_code = request.form["country_code"]
+            time_spent = float(request.form["time_spent"])
+            account_age = int(request.form["account_age"])
 
-    result = None
-    if request.method == 'POST':
-        amount = float(request.form['amount'])
-        frequency = int(request.form['frequency'])
-        location = request.form['location']
-        if amount > 3000 and frequency < 2 and location.lower() == 'unknown':
-            result = "Transaction potentiellement frauduleuse"
-        else:
-            result = "Transaction légitime"
-    return render_template('predict.html', result=result)
+            # Validate country code exists in locations
+            if country_code not in locations:
+                result = "Error: Selected country is not recognized."
+                return render_template("predict.html", result=result, locations=locations)
 
+            # Get country name and encode based on country code index
+            country_name = locations[country_code]["country"]
+            location_encoded = list(locations.keys()).index(country_code)
+
+            input_data = np.array([[amount, frequency, location_encoded, time_spent, account_age]])
+            prediction = model.predict(input_data)[0]
+            prob = model.predict_proba(input_data)[0][1]
+
+            if prob > 0.3:
+                reasons = []
+                if amount > 100000:
+                    reasons.append("The amount is very high")
+                if frequency < 2:
+                    reasons.append("Transaction frequency is low")
+                if country_name in risky_countries:
+                    reasons.append(f"The country of origin ({country_name}) is considered risky")
+                if time_spent < 10:
+                    reasons.append("Time spent on website is very short")
+                if account_age < 50:
+                    reasons.append("The account is recent")
+                explanation = " and ".join(reasons) if reasons else "No significant risk factors detected"
+            else:
+                explanation = "Risk is low, no significant factors to display."
+
+            result = f"Estimated fraud risk: {prob * 100:.1f}%<br><br>Reason(s): {explanation}."
+
+            # ----------- SAVE TO HISTORY -----------
+            if 'email' in session:
+                user_email = session['email']
+                history_entry = PredictionHistory(
+                    user_email=user_email,
+                    amount=amount,
+                    frequency=frequency,
+                    country_code=country_code,
+                    time_spent=time_spent,
+                    account_age=account_age,
+                    prediction=prediction,
+                    probability=prob
+                )
+                db.session.add(history_entry)
+                db.session.commit()
+            # -----------------------------------------
+            return render_template("predict.html", result=result, locations=locations, country_code=country_code)
+        except ValueError as e:
+            result = "Error: Please ensure all fields are filled correctly."
+            return render_template("predict.html", result=result, locations=locations)
+    return render_template("predict.html", locations=locations, country_names=country_names)
 
 #------------------delete-account----------------
 
@@ -327,11 +392,11 @@ def delete_request():
         email = request.form.get('email')
         password = request.form.get('password')
 
-        if email and password:  # only check if both fields are filled
+        if email and password:  
             user = User.query.get(email)
 
             if user and user.check_password(password):
-                # Generate and send code
+                
                 code = ''.join(random.choices(string.digits, k=6))
                 session['delete_code'] = code
                 session['delete_email'] = email
@@ -350,7 +415,7 @@ def delete_request():
 @app.route('/delete_verify', methods=['GET', 'POST'])
 def delete_verify():
     if 'delete_code' not in session or 'delete_email' not in session:
-        return redirect(url_for('profile'))  # No verification initiated
+        return redirect(url_for('profile'))  
 
     error = None
 
@@ -364,24 +429,48 @@ def delete_verify():
                 db.session.delete(user)
                 db.session.commit()
 
-            # Remove user-related session data
+            
             session.pop('delete_code', None)
             session.pop('delete_email', None)
-            session.pop('email', None)  # if used for login session
-            session.pop('username', None)  # if you store this
+            session.pop('email', None)  
+            session.pop('username', None)  
 
-            return redirect(url_for('welcome'))  # Goodbye or homepage
+            return redirect(url_for('welcome'))  
         else:
             error = "Incorrect verification code."
 
     return render_template('delete_verify.html', error=error)
-4
+
 #------------------about----------------
-@app.route('/about')
+@app.route("/about", methods=["GET", "POST"])
 def about():
+    error = None
+    success = None
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        message = request.form.get("message")
+
+        if not name or not email or not message:
+            error = "Please fill in all fields."
+        else:
+            success = "Thank you for your message! We will get back to you shortly."
+
+    return render_template("about.html", error=error, success=success)
+
+
+#------------------history----------------
+
+@app.route('/history')
+def history():
     if 'email' not in session:
         return redirect(url_for('login'))
-    return render_template('about.html')
+    user_history = PredictionHistory.query.filter_by(user_email=session['email']).order_by(PredictionHistory.id.desc()).all()
+    with open('locations.json', 'r', encoding='utf-8') as f:
+        locations = json.load(f)
+    return render_template('history.html', history=user_history, locations=locations)
 
+            
+#------------------main----------------
 if __name__ == '__main__':
     app.run(debug=True)

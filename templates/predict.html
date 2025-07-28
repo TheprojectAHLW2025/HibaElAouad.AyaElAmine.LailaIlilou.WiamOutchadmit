@@ -1,16 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
-  <h2>Soumettre une transaction</h2>
+  <h2>Predict Fraudulent Transaction</h2>
   <form method="POST">
-    <label>Montant (MAD)</label>
-    <input type="number" name="amount" required>
-    <label>Fréquence hebdomadaire</label>
-    <input type="number" name="frequency" required>
-    <label>Localisation</label>
-    <input type="text" name="location" required>
-    <button type="submit">Analyser</button>
+    <div>
+      <label for="amount">Transaction Amount:</label><br>
+      <input type="number" step="0.01" id="amount" name="amount" placeholder="Ex: 150.50" required>
+    </div>
+
+    <div>
+      <label for="frequency">Transaction Frequency:</label><br>
+      <input type="number" step="1" id="frequency" name="frequency" placeholder="Ex: 3.5" required>
+    </div>
+
+    <div style="margin-top: 20px; margin-bottom: 20px;">
+      <label for="country">Country :</label>
+      <select name="country_code" id="country_code" required>
+        <option value="" disabled selected>Choose a country</option>
+        {% for code, data in locations.items() %}
+        <option value="{{ code }}">{{ data.country }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="time_spent">Time Spent on Website (seconds):</label><br>
+      <input type="number" id="time_spent" name="time_spent" placeholder="Ex: 120" required>
+    </div>
+
+    <div>
+      <label for="account_age">Account Age (days):</label><br>
+      <input type="number" id="account_age" name="account_age" placeholder="Ex: 365" required>
+    </div>
+
+    <button type="submit">Predict</button>
   </form>
+
   {% if result %}
-    <div class="alert">{{ result }}</div>
+    <div class="result-box">
+    {{ result|safe }}
+  </div>
   {% endif %}
 {% endblock %}

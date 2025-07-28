@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">My Predictions History</h2>
+    {% if history %}
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Frequency</th>
+                    <th>Country</th>
+                    <th>Time Spent</th>
+                    <th>Account Age</th>
+                    <th>Result</th>
+                    <th>Probability</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in history %}
+                <tr>
+                    <td>{{ h.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ h.amount }}</td>
+                    <td>{{ h.frequency }}</td>
+                    <td>
+                        {{ locations[h.country_code]['country'] if h.country_code in locations else h.country_code }}
+                    </td>
+                    <td>{{ h.time_spent }}</td>
+                    <td>{{ h.account_age }}</td>
+                    <td>
+                        {% if h.prediction == '1' or h.prediction == 1 %}
+                            <span class="badge bg-danger">Fraud</span>
+                        {% else %}
+                            <span class="badge bg-success">OK</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ (h.probability * 100) | round(1) }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="alert alert-info">No predictions history found.</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,6 +1,50 @@
 {% extends "base.html" %}
 {% block content %}
-  <h2>About</h2>
-  <p>.</p>
-{% endblock %}
+  <h2>About Us</h2>
+  
+  <section id="about" style="margin-bottom: 30px;">
+    <p>
+      Welcome to our Fraud Detection platform! Our mission is to help businesses and individuals
+      identify and prevent fraudulent transactions using advanced machine learning models.
+      If you have any questions, suggestions, or need assistance, feel free to reach out below.
+    </p>
+  </section>
 
+  <section id="contact-info" style="margin-bottom: 30px;">
+    <h3>Contact Information</h3>
+    <p><strong>Address:</strong> Agadir , Morocco</p>
+    <p><strong>Phone:</strong> +123 456 7890</p>
+    <p><strong>Email:</strong> theproject.aalw.2025@gmail.com</p>
+  </section>
+  
+  <section id="leave-review" style="margin-bottom: 30px;">
+    <h3>Leave Us Your Review</h3>
+    <p>
+      We appreciate your feedback! Please share your thoughts, suggestions, or experiences 
+      with our platform. Your reviews help us improve and serve you better.
+    </p>
+  </section>
+
+  {% if success %}
+    <p style="color:green;">{{ success }}</p>
+  {% endif %}
+  {% if error %}
+    <p style="color:red;">{{ error }}</p>
+  {% endif %}
+  
+  <form method="POST" action="{{ url_for('about') }}">
+    <div>
+      <label for="name">Name:</label><br>
+      <input type="text" id="name" name="name" required>
+    </div>
+    <div>
+      <label for="email">Email:</label><br>
+      <input type="email" id="email" name="email" required>
+    </div>
+    <div>
+      <label for="message">Message:</label><br>
+      <textarea id="message" name="message" rows="5" style="width: 700px;" required></textarea>
+    </div>
+    <button type="submit">Send</button>
+  </form>
+{% endblock %}
